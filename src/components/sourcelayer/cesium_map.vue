@@ -1,0 +1,167 @@
+<!--
+ * @Author: eds
+ * @Date: 2020-08-20 18:52:41
+ * @LastEditTime: 2020-09-15 11:01:20
+ * @LastEditors: eds
+ * @Description:
+ * @FilePath: \wz-city-culture-tour\src\components\sourcelayer\cesium_map.vue
+-->
+<template>
+  <div class="cesiumContainer">
+    <div id="cesiumContainer" />
+    <!-- 功能组件 -->
+    <div v-if="mapLoaded">
+      <CesiumMapVideo />
+    </div>
+  </div>
+</template>
+
+<script>
+//  范围点
+let bounds = {
+  west: 120.58254,
+  east: 120.738342,
+  south: 27.984375,
+  north: 28.031321,
+};
+import { ServiceUrl } from "config/server/mapConfig";
+import CesiumMapVideo from "components/sourcelayer/extraModel/CesiumMapVideo/CesiumMapVideo";
+import { CenterPoint } from "mock/overview.js";
+import {
+  mapConfigInit,
+  mapImageLayerInit,
+  mapMvtLayerInit,
+  mapRiverLayerInit,
+  mapBaimoLayerInit,
+  mapRoadLampLayerInit,
+  mapRoadLampLayerTurn,
+} from "components/sourcelayer/cesium_map_init";
+import { mapGetters } from "vuex";
+const Cesium = window.Cesium;
+
+export default {
+  data() {
+    return {
+      mapLoaded: false,
+    };
+  },
+  computed: {
+    ...mapGetters("map", ["initDataLoaded", "forceTreeLabel"]),
+  },
+  components: {
+    CesiumMapVideo,
+  },
+  created() {
+    //  点位信息 hash
+    window.featureMap = {};
+    //  点位icon hash
+    window.billboardMap = {};
+    //  点位label hash
+    window.labelMap = {};
+  },
+  async mounted() {
+    await this.init3DMap(() => {
+      this.mapLoaded = true;
+      // this.initPostRender();
+      this.initHandler();
+    });
+    this.eventRegsiter();
+  },
+  methods: {
+    initPostRender() {
+      window.earth.scene.postRender.addEventListener(() => {
+        if (!window.earth || !this.mapLoaded) return;
+      });
+    },
+    initHandler() {
+      const handler = new Cesium.ScreenSpaceEventHandler(window.earth.scene.canvas);
+      // 监听左键点击事件
+      handler.setInputAction((e) => {
+        const pick = window.earth.scene.pick(e.position);
+        if (!pick || !pick.id) return;
+        if (typeof pick.id == "object") {
+          //  *****[videoCircle]  监控视频点*****
+          if (pick.id.id && ~pick.id.id.indexOf("normalpoint_")) {
+            this.$bus.$emit("cesium-3d-normalPointClick", {
+              mp_id: pick.id.id,
+              mp_name: pick.id.name,
+            });
+          }
+        } else if (typeof pick.id == "string") {
+          const [_TYPE_, _SMID_, _NODEID_] = pick.id.split("@");
+          //  *****[detailPopup]  资源详情点*****
+          if (~["label", "billboard"].indexOf(_TYPE_)) {
+            this.$refs.detailPopup.getForceEntity({
+              ...window.featureMap[_NODEID_][_SMID_],
+              position: pick.primitive.position,
+            });
+          }
+        }
+      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    },
+    /**
+     * 事件注册
+     */
+    eventRegsiter() {},
+    /**
+     * 地图初始化
+     * @param {function} fn 回调函数
+     */
+    async init3DMap(fn) {
+      const that = this;
+      window.earth = new Cesium.Viewer("cesiumContainer", {
+        infoBox: false,
+        selectionIndicator: false,
+        shadows: false,
+      });
+      //  地图配置
+      mapConfigInit();
+      //  相机位置
+      this.cameraMove();
+      //  大数据地图
+      window.datalayer = mapImageLayerInit(ServiceUrl.SWImage);
+      //  地图注记
+      // const mapMvt = mapMvtLayerInit("mapMvt", ServiceUrl.YJMVT);
+      //  重要地物注记
+      // const keyMvt = mapMvtLayerInit("keyMvt", ServiceUrl.KEYMVT);
+      //  水面
+      // await mapRiverLayerInit("RIVER", ServiceUrl.STATIC_RIVER);
+      //  白模叠加
+      await mapBaimoLayerInit(ServiceUrl.WZBaimo_OBJ);
+      //  路灯、光源叠加
+      // mapRoadLampLayerInit();
+      //  回调钩子
+      fn && fn();
+    },
+    /**
+     * move your fat ass bro
+     */
+    cameraMove() {
+      window.earth.scene.camera.setView(CenterPoint);
+    },
+  },
+};
+</script>
+
+<style lang="less">
+.cesiumContainer {
+  height: 100%;
+  width: 100%;
+  #cesiumContainer {
+    height: 100%;
+    width: 100%;
+    // color: rgb(42, 104, 163);
+  }
+}
+.mapCover {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 8;
+}
+.cesium-viewer-navigationContainer {
+  display: none;
+}
+</style>
