@@ -1,30 +1,30 @@
 <template>
   <div class="rtspVideo">
     <Rtsp1 />
-    <Rtsp2 />
   </div>
 </template>
 
 <script>
 import Rtsp1 from "./Rtsp1";
-import Rtsp2 from "./Rtsp2";
+// import Rtsp2 from "./Rtsp2";
 export default {
   name: "rtspVideo",
   data() {
-    return {};
+    return {
+      forceEtyId: undefined,
+    };
   },
   mounted() {
     this.eventRegsiter();
-    this.initRtspVideo();
+    this.initLayer();
   },
-  components: { Rtsp1, Rtsp2 },
+  components: { Rtsp1 },
   beforeDestroy() {},
   methods: {
     eventRegsiter() {},
-    initRtspVideo() {},
+    initLayer() {},
   },
 };
 </script>
 
-<style lang="less" scoped>
-</style>
+<style lang="less" scoped></style>

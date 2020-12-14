@@ -28,6 +28,12 @@ import { ServiceUrl } from "config/server/mapConfig";
 import CesiumMapVideo from "components/sourcelayer/extraModel/CesiumMapVideo/CesiumMapVideo";
 import { CenterPoint } from "mock/overview.js";
 import {
+  forceOnEntity,
+  mouseDownForce,
+  mouseUpRelease,
+  mouseMove,
+} from "./extraModel/CesiumMapVideo/RtspVideoTool";
+import {
   mapConfigInit,
   mapImageLayerInit,
   mapMvtLayerInit,
@@ -58,6 +64,11 @@ export default {
     window.billboardMap = {};
     //  点位label hash
     window.labelMap = {};
+    //  视频调整
+    window.etys = {};
+    window.etyEdits = undefined;
+    window.forceDragObject = undefined;
+    window.doDragFlag = undefined;
   },
   async mounted() {
     await this.init3DMap(() => {
@@ -79,6 +90,7 @@ export default {
       handler.setInputAction((e) => {
         const pick = window.earth.scene.pick(e.position);
         if (!pick || !pick.id) return;
+        console.log(pick);
         if (typeof pick.id == "object") {
           //  *****[videoCircle]  监控视频点*****
           if (pick.id.id && ~pick.id.id.indexOf("normalpoint_")) {
@@ -86,6 +98,8 @@ export default {
               mp_id: pick.id.id,
               mp_name: pick.id.name,
             });
+          } else if (pick.id.id && ~pick.id.id.indexOf("Rtsp")) {
+            forceOnEntity(pick.id.id);
           }
         } else if (typeof pick.id == "string") {
           const [_TYPE_, _SMID_, _NODEID_] = pick.id.split("@");
@@ -98,6 +112,18 @@ export default {
           }
         }
       }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+      // 监听左键按下事件
+      handler.setInputAction((e) => {
+        mouseDownForce(e);
+      }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+      // 监听左键抬起事件
+      handler.setInputAction((e) => {
+        mouseUpRelease(e);
+      }, Cesium.ScreenSpaceEventType.LEFT_UP);
+      // 监听左键移动事件
+      handler.setInputAction((e) => {
+        mouseMove(e);
+      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     },
     /**
      * 事件注册
