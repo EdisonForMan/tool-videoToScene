@@ -5,6 +5,8 @@
 export const forceOnEntity = (id) => {
     if (window.etyEdits) {
         window.etyEdits.setEditObject(window.etys[id]);
+        window.etyEdits._polygon.show = false;
+        window.etyEdits._polygon.show = true;
     } else {
         window.etyEdits = new Cesium.EditHandler(
             window.earth,
@@ -12,7 +14,8 @@ export const forceOnEntity = (id) => {
         );
         window.etyEdits.isEditZ = false;
     }
-    window.etyEdits.activate();
+    // window.etyEdits.activate();
+
 }
 
 /**
