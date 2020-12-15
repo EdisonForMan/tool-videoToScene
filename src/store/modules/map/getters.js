@@ -10,6 +10,8 @@
 import state from "./state";
 
 // 获取state
+export const onMapVideoForceId = state => state.onMapVideoForceId;
+export const onMapVideo = state => state.onMapVideo;
 export const forceMapTypeBase = state => state.forceMapTypeBase;
 export const currentMapType = state => state.currentMapType;
 export const mapLoaded = state => state.mapLoaded;

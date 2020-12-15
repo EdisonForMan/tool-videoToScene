@@ -9,29 +9,30 @@
 <template>
   <div class="cesiumContainer">
     <div id="cesiumContainer" />
+    <!-- 气泡框 -->
+    <div class="popup-groups">
+      <DetailPopup ref="detailPopup" />
+    </div>
     <!-- 功能组件 -->
     <div v-if="mapLoaded">
       <CesiumMapVideo />
+      <RtmpVideo />
     </div>
   </div>
 </template>
 
 <script>
-//  范围点
-let bounds = {
-  west: 120.58254,
-  east: 120.738342,
-  south: 27.984375,
-  north: 28.031321,
-};
 import { ServiceUrl } from "config/server/mapConfig";
 import CesiumMapVideo from "components/sourcelayer/extraModel/CesiumMapVideo/CesiumMapVideo";
+import DetailPopup from "components/sourcelayer/commonFrame/Popups/DetailPopup";
+import RtmpVideo from "components/sourcelayer/extraModel/RtmpVideo/RtmpVideo";
 import { CenterPoint } from "mock/overview.js";
 import {
   forceOnEntity,
   mouseDownForce,
   mouseUpRelease,
   mouseMove,
+  drawLuChengOPoints,
 } from "./extraModel/CesiumMapVideo/RtspVideoTool";
 import {
   mapConfigInit,
@@ -56,6 +57,8 @@ export default {
   },
   components: {
     CesiumMapVideo,
+    DetailPopup,
+    RtmpVideo,
   },
   created() {
     //  点位信息 hash
@@ -90,7 +93,6 @@ export default {
       handler.setInputAction((e) => {
         const pick = window.earth.scene.pick(e.position);
         if (!pick || !pick.id) return;
-        console.log(pick);
         if (typeof pick.id == "object") {
           //  *****[videoCircle]  监控视频点*****
           if (pick.id.id && ~pick.id.id.indexOf("normalpoint_")) {
@@ -100,13 +102,15 @@ export default {
             });
           } else if (pick.id.id && ~pick.id.id.indexOf("Rtsp")) {
             forceOnEntity(pick.id.id);
+            this.$bus.$emit("cesium-3d-video-force-id", {
+              id: pick.id.id,
+            });
           }
         } else if (typeof pick.id == "string") {
-          const [_TYPE_, _SMID_, _NODEID_] = pick.id.split("@");
           //  *****[detailPopup]  资源详情点*****
-          if (~["label", "billboard"].indexOf(_TYPE_)) {
+          if (~pick.id.indexOf("Lucheng")) {
             this.$refs.detailPopup.getForceEntity({
-              ...window.featureMap[_NODEID_][_SMID_],
+              id: pick.id,
               position: pick.primitive.position,
             });
           }
@@ -150,8 +154,8 @@ export default {
       // const mapMvt = mapMvtLayerInit("mapMvt", ServiceUrl.YJMVT);
       //  重要地物注记
       // const keyMvt = mapMvtLayerInit("keyMvt", ServiceUrl.KEYMVT);
-      //  水面
-      // await mapRiverLayerInit("RIVER", ServiceUrl.STATIC_RIVER);
+      //  画鹿城点
+      drawLuChengOPoints();
       //  白模叠加
       await mapBaimoLayerInit(ServiceUrl.WZBaimo_OBJ);
       //  路灯、光源叠加

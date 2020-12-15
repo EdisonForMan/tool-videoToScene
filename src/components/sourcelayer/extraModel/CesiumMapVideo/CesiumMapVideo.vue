@@ -1,18 +1,16 @@
 <template>
   <div class="rtspVideo">
-    <Rtsp1 />
+    <Rtsp1 v-for="(value, key, index) in onMapVideo" :key="index" :rtspData="value" />
   </div>
 </template>
 
 <script>
 import Rtsp1 from "./Rtsp1";
-// import Rtsp2 from "./Rtsp2";
+import { mapGetters, mapActions } from "vuex";
 export default {
   name: "rtspVideo",
-  data() {
-    return {
-      forceEtyId: undefined,
-    };
+  computed: {
+    ...mapGetters("map", ["onMapVideo"]),
   },
   mounted() {
     this.eventRegsiter();
@@ -21,7 +19,13 @@ export default {
   components: { Rtsp1 },
   beforeDestroy() {},
   methods: {
-    eventRegsiter() {},
+    ...mapActions("map", ["SetOnMapVideoForceId"]),
+    eventRegsiter() {
+      this.$bus.$off("cesium-3d-video-force-id");
+      this.$bus.$on("cesium-3d-video-force-id", ({ id }) => {
+        this.SetOnMapVideoForceId(id);
+      });
+    },
     initLayer() {},
   },
 };

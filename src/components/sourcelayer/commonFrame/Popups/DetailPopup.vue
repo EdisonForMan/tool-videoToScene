@@ -7,49 +7,7 @@
  * @FilePath: \wz-city-culture-tour\src\components\sourcelayer\commonFrame\DetailPopup\DetailPopup.vue
 -->
 <template>
-  <div id="forcePopUp" v-show="forcePosition.x && forcePosition.y">
-    <div
-      id="forcePopUpContent"
-      class="leaflet-popup"
-      :style="{
-        transform: `translate3d(${forcePosition.x}px,${forcePosition.y}px, 0)`,
-      }"
-    >
-      <a class="leaflet-popup-close-button" href="#" @click="closePopup">×</a>
-      <div class="leaflet-popup-content-wrapper">
-        <div id="forcePopUpLink" class="leaflet-popup-content">
-          <div class="leaflet-popup-content">
-            <header>
-              {{ forceEntity.name }}
-            </header>
-            <ul class="content-body">
-              <li
-                v-for="(item, key, index) in forceEntity.fix_data"
-                :key="index"
-                v-show="item && !~filterKey.indexOf(key)"
-              >
-                <span>{{ key }}</span>
-                <span>{{ item }}</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="extra-tab to-rtmp-video" @click="doVideoRtmp">直达现场</div>
-        <div class="extra-tab to-around-people" @click="doCircleBuffer">周边人口</div>
-        <div class="around-people" v-if="buffer && buffer.success">
-          <!-- <img src="/static/images/common/frameline@2x.png" /> -->
-          <div>
-            <header>周边实时人口</header>
-            <div>
-              <p>范围：500米</p>
-              <strong>{{ `人数：${buffer.data || "-"}人` }}</strong>
-              <p>{{ buffer.task_time }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div id="forcePopUp" />
 </template>
 
 <script>
@@ -57,9 +15,6 @@ export default {
   data() {
     return {
       forceEntity: {},
-      forcePosition: {},
-      buffer: null,
-      filterKey: ["永久固定码", "唯一码", "分类代码"],
     };
   },
   async mounted() {
@@ -67,9 +22,6 @@ export default {
   },
   methods: {
     eventRegsiter() {
-      this.$bus.$on("cesium-3d-around-people", ({ id, result }) => {
-        this.buffer = result;
-      });
       this.$bus.$on("cesium-3d-detail-pop-clear", () => {
         this.closePopup();
       });
@@ -81,48 +33,8 @@ export default {
     getForceEntity(forceEntity) {
       this.forceEntity = forceEntity;
       this.buffer = null;
-      this.$bus.$emit("cesium-3d-population-circle", { doDraw: false });
       this.$bus.$emit("cesium-3d-rtmpFetch-cb");
-    },
-    /**
-     *  框体移动
-     *  @param {object} position
-     */
-    renderForceEntity() {
-      const forceEntity = this.forceEntity;
-      if (forceEntity.fix_data) {
-        const pointToWindow = Cesium.SceneTransforms.wgs84ToWindowCoordinates(
-          window.earth.scene,
-          forceEntity.position
-        );
-        if (
-          this.forcePosition.x !== pointToWindow.x ||
-          this.forcePosition.y !== pointToWindow.y
-        ) {
-          this.forcePosition = {
-            x:
-              pointToWindow.x -
-              (($(".leaflet-popup-content-wrapper").width() || 0) * 1.2) / 2,
-            y: pointToWindow.y - ($(".leaflet-popup-content-wrapper").height() || 0) - 90,
-          };
-        }
-      }
-    },
-    /**
-     * 人口缓冲区（直接pop组件里画）
-     * 开专门的缓冲区collection
-     */
-    doCircleBuffer() {
-      this.buffer = this.buffer ? null : {};
-      const { name, geometry } = this.forceEntity;
-      this.$bus.$emit("cesium-3d-population-circle", {
-        doDraw: this.buffer,
-        id: name,
-        geometry: {
-          lng: geometry.x,
-          lat: geometry.y,
-        },
-      });
+      this.doVideoRtmp();
     },
 
     /**
@@ -130,18 +42,14 @@ export default {
      * @param {object} param0 该医疗点的对象信息
      */
     doVideoRtmp() {
-      const { geometry, name } = this.forceEntity;
-      const { x, y } = geometry;
+      const { id } = this.forceEntity;
+      const { x, y } = window.featureMap[id].geometry;
       this.$bus.$emit("cesium-3d-rtmpFetch", {
-        shortname: name,
+        shortname: id,
         geometry: { lng: x, lat: y },
       });
     },
     closePopup() {
-      this.forcePosition = {};
-      this.forceEntity = {};
-      this.buffer = null;
-      this.$bus.$emit("cesium-3d-population-circle", { doDraw: false });
       this.$bus.$emit("cesium-3d-rtmpFetch-cb");
     },
   },

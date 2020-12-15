@@ -11,6 +11,7 @@ import {
   getMedicalList, getBayonetList, getStationList, getTourPointList, fetchWzOverviewData, fetchWzTrafficData,
   fetchMedicalData, fetchTourData, fetchCultureData, fetchSourceData, fetchBasicData, fetchWzPeopleData, fetchEmergencyData
 } from "api/layerServerAPI";
+import state from "./state";
 
 /**
  * 对象下所有值相加
@@ -232,3 +233,20 @@ export const SetForceTrueTopicLabels = ({ commit }, data) => {
 export const SetForceTrueTopicLabelId = ({ commit }, data) => {
   commit(types.SET_FORCE_TRUE_TOPIC_LABEL_ID, data);
 };
+//  设置视频对象
+export const SetOnMapVideo = ({ commit }, data) => {
+  const onMapVideo = JSON.parse(JSON.stringify(state.onMapVideo));
+  onMapVideo[data.mp_id] = data;
+  console.log('add', onMapVideo)
+  commit(types.SET_ON_MAP_VIDEO, onMapVideo);
+}
+export const DeleteOnMapVideo = ({ commit }, data) => {
+  const onMapVideo = JSON.parse(JSON.stringify(state.onMapVideo));
+  delete onMapVideo[data.mp_id];
+  console.log('delete', onMapVideo)
+  commit(types.SET_ON_MAP_VIDEO, onMapVideo);
+}
+//  设置视频编辑ID
+export const SetOnMapVideoForceId = ({ commit }, data) => {
+  commit(types.SET_ON_MAP_VIDEO_FORCE_ID, data);
+}

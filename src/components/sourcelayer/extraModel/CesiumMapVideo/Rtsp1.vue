@@ -1,5 +1,5 @@
 <template>
-  <div class="videoDemoPlayer">
+  <div class="videoDemoPlayer" :class="{ video_visi: onMapVideoForceId != id }">
     <div class="demonstration">
       <span>角度: {{ rotate / 100 }} </span>
       <span class="video-silder">
@@ -10,41 +10,51 @@
           @change="(value) => setVideoRotate(value)"
         />
       </span>
+      <span class="release-video" @click="releaseVideo">关闭视频</span>
     </div>
     <div :id="id" class="frequency-pic type1" />
   </div>
 </template>
 <script>
+import { mapGetters, mapActions } from "vuex";
 import { getRtmpVideoURL } from "api/cityBrainAPI";
 const Aliplayer = window.Aliplayer;
 export default {
   name: "Rtsp1",
   data() {
     return {
-      id: "Rtsp1",
       video: undefined,
       videoTimer: undefined,
       ety: undefined,
       rotate: 0,
     };
   },
+  props: ["rtspData"],
+  computed: {
+    ...mapGetters("map", ["onMapVideoForceId"]),
+  },
+  created() {
+    this.id = "Rtsp" + this.rtspData.mp_id;
+  },
   beforeDestroy() {
     this.video && this.video.dispose();
     this.video && (this.video = undefined);
-    window.earth.entities.removeById(this.id);
+    window.etyEdits.clear();
+    window.earth.entities.remove(window.etys[this.id]);
+    window.etys[this.id] = undefined;
     clearInterval(this.videoTimer);
   },
   async mounted() {
-    const { data } = await getRtmpVideoURL("122213000100000131003310");
-    this.initRtmp(data);
+    this.initRtmp();
   },
   methods: {
-    initRtmp({ flv }) {
+    ...mapActions("map", ["DeleteOnMapVideo", "SetOnMapVideoForceId"]),
+    initRtmp() {
       this.video = undefined;
       this.video = new Aliplayer(
         {
           id: this.id,
-          source: flv,
+          source: this.rtspData.flv,
           width: "100%",
           height: "200px",
           autoplay: true,
@@ -70,7 +80,6 @@ export default {
     initVideoToMap() {
       window.etys[this.id] = window.earth.entities.add({
         id: this.id,
-        
         polygon: {
           hierarchy: new Cesium.PolygonHierarchy(
             Cesium.Cartesian3.fromDegreesArray([
@@ -95,6 +104,10 @@ export default {
     setVideoRotate() {
       window.etys[this.id].polygon.stRotation.setValue(this.rotate / 100);
     },
+    releaseVideo() {
+      this.DeleteOnMapVideo(this.rtspData);
+      this.SetOnMapVideoForceId(undefined);
+    },
   },
 };
 </script>
@@ -110,6 +123,9 @@ export default {
   padding: 10px;
   background: rgba(0, 0, 0, 0.6);
   border-radius: 10px;
+  &.video_visi {
+    visibility: hidden;
+  }
   .frequency-pic {
     height: 200px;
   }
@@ -125,6 +141,9 @@ export default {
     }
     .video-silder {
       flex: 1;
+    }
+    .release-video {
+      cursor: pointer;
     }
   }
 }

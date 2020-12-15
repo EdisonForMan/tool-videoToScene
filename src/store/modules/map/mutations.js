@@ -11,6 +11,12 @@ import { type } from "jquery";
 import * as types from "./mutation-types";
 
 const mutations = {
+  [types.SET_ON_MAP_VIDEO_FORCE_ID](state, data) {
+    state.onMapVideoForceId = data;
+  },
+  [types.SET_ON_MAP_VIDEO](state, data) {
+    state.onMapVideo = data;
+  },
   [types.SET_WZ_EMERGENCY_DATA](state, data) {
     state.WzEmergencyData = data;
   },

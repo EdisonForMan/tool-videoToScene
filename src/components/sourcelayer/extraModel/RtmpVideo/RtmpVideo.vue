@@ -8,7 +8,7 @@
 -->
 <template>
   <div class="rtmpVideo">
-    <div class="rtmpListFrame" v-if="doRtmpListFrame">
+    <!-- <div class="rtmpListFrame" v-if="doRtmpListFrame">
       <header>
         <span>现场视频</span> /
         <span>{{ RtmpForcePoint.shortname }}</span>
@@ -97,7 +97,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -146,7 +146,7 @@ export default {
     this.eventRegsiter();
   },
   methods: {
-    ...mapActions("map", ["SetRtmpList"]),
+    ...mapActions("map", ["SetRtmpList", "SetOnMapVideo"]),
     //  事件绑定
     eventRegsiter() {
       const that = this;
@@ -156,30 +156,16 @@ export default {
         this.isCircleVideo = false;
         this.isHightVideo = false;
         this.RtmpForcePoint = item;
-        const { data } = await getRtmpVideoList(
-          item.geometry,
-          this.radiusRange
-        );
+        const { data } = await getRtmpVideoList(item.geometry, this.radiusRange);
         this.SetRtmpList(data);
-        data.length && this.openRtmpVideoFrame(data[0]);
-        this.doRtmpListFrame = true;
+        // data.length && this.openRtmpVideoFrame(data[0]);
+        // this.doRtmpListFrame = true;
         this.removeVideoCircle();
         this.drawVideoCircle(item.geometry, this.radiusRange);
       });
       this.$bus.$off("cesium-3d-rtmpFetch-cb");
       this.$bus.$on("cesium-3d-rtmpFetch-cb", () => {
         this.removeVideoCircle();
-      });
-      // 穿透事件监控视频点
-      this.$bus.$off("cesium-3d-videoPointClick");
-      this.$bus.$on("cesium-3d-videoPointClick", (item) => {
-        this.isCircleVideo = true;
-        this.fixRtmpList.length &&
-          this.openRtmpVideoFrame({
-            mp_name: item.mp_name,
-            mp_id: item.mp_id.split("videopoint_")[1],
-          });
-        this.doRtmpListFrame = true;
       });
       // 图层监控视频点
       this.$bus.$off("cesium-3d-normalPointClick");
@@ -188,7 +174,7 @@ export default {
         this.fixRtmpList.length &&
           this.openRtmpVideoFrame({
             mp_name: item.mp_name,
-            mp_id: item.mp_id.split("videopoint_")[1],
+            mp_id: item.mp_id.split("normalpoint_")[1],
           });
         this.doRtmpListFrame = true;
       });
@@ -199,14 +185,23 @@ export default {
      */
     async openRtmpVideoFrame({ mp_name, mp_id }) {
       this.forceRtmpVideo = mp_name;
-      const { data } = await getRtmpVideoURL(mp_id);
-      this.RtmpVideoURL = undefined;
-      this.RtmpVideoMode = "flash";
-      data &&
-        this.$nextTick(() => {
-          this.RtmpVideoURL = data.flv;
-          this.RtmpVideoMode = data.play_mode;
+      if (!mp_id) {
+        this.$message({
+          message: "无法获取视频，mp_id为空",
+          type: "error",
         });
+      } else {
+        const { data } = await getRtmpVideoURL(mp_id);
+        this.SetOnMapVideo({ mp_id, ...data });
+      }
+
+      // this.RtmpVideoURL = undefined;
+      // this.RtmpVideoMode = "flash";
+      // data &&
+      //   this.$nextTick(() => {
+      //     this.RtmpVideoURL = data.flv;
+      //     this.RtmpVideoMode = data.play_mode;
+      //   });
     },
     async refreshRtmpVideoList() {
       const { data } = await getRtmpVideoList(
@@ -232,7 +227,7 @@ export default {
         ellipse: {
           semiMinorAxis: queryRadius,
           semiMajorAxis: queryRadius,
-          height: 12,
+          height: 1,
           material: Cesium.Color.WHITE.withAlpha(0.1),
           outline: true,
           outlineWidth: 3,
@@ -242,39 +237,11 @@ export default {
       });
       window.earth.entities.add(circleEntity);
       this.entitiesID.push(circleEntity.id);
-      const circleLabelEntity = new Cesium.Entity({
-        position: Cesium.Cartesian3.fromDegrees(lng, lat, 200),
-        label: {
-          text: `周边${queryRadius}米内监控`,
-          fillColor: Cesium.Color.WHITE,
-          outlineColor: Cesium.Color.BLACK,
-          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-          font: "10px",
-          scale: 1,
-          outlineWidth: 4,
-          showBackground: true,
-          backgroundColor: Cesium.Color(0.165, 0.165, 0.165, 0.1),
-          distanceDisplayCondition: new Cesium.DistanceDisplayCondition(
-            0,
-            10000
-          ),
-          eyeOffset: new Cesium.Cartesian3(0.0, -260.0, 0),
-          scaleByDistance: new Cesium.NearFarScalar(5000, 1, 10000, 0.5),
-          disableDepthTestDistance: Number.POSITIVE_INFINITY,
-        },
-        name: "normalCircleLabel",
-      });
-      window.earth.entities.add(circleLabelEntity);
-      this.entitiesID.push(circleLabelEntity.id);
 
       this.rtmpList.forEach((item) => {
         const videoPointEntity = new Cesium.Entity({
           id: `normalpoint_${item.mp_id}`,
-          position: Cesium.Cartesian3.fromDegrees(
-            Number(item.lng),
-            Number(item.lat),
-            30
-          ),
+          position: Cesium.Cartesian3.fromDegrees(Number(item.lng), Number(item.lat), 2),
           billboard: {
             image: "/static/images/map-ico/视频监控.png",
             width: 40,
@@ -447,11 +414,7 @@ export default {
             box-sizing: border-box;
             padding-right: 4px;
             .rtmp_active {
-              background-image: linear-gradient(
-                to right,
-                #2acbfe 0%,
-                #002a38 100%
-              );
+              background-image: linear-gradient(to right, #2acbfe 0%, #002a38 100%);
             }
             > li {
               cursor: pointer;
@@ -464,11 +427,7 @@ export default {
               box-sizing: border-box;
               padding-right: 8px;
               &:hover {
-                background-image: linear-gradient(
-                  to right,
-                  #2acbfe 0%,
-                  #002a38 100%
-                );
+                background-image: linear-gradient(to right, #2acbfe 0%, #002a38 100%);
               }
               > span {
                 display: inline-block;

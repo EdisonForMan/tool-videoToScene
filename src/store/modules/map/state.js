@@ -50,5 +50,8 @@ const state = {
   forceTreeLabel: "医疗专题",
   forceTrueTopicLabels: [],
   forceTrueTopicLabelId: "",
+  //  视频控件
+  onMapVideo: {},
+  onMapVideoForceId: undefined
 };
 export default state;
