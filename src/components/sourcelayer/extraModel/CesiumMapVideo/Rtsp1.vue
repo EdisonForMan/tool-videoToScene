@@ -41,7 +41,7 @@ export default {
   beforeDestroy() {
     this.video && this.video.dispose();
     this.video && (this.video = undefined);
-    window.etyEdits.clear();
+    window.etyEdits && window.etyEdits.clear();
     window.earth.entities.remove(window.etys[this.id]);
     window.etys[this.id] = undefined;
     clearInterval(this.videoTimer);

@@ -241,13 +241,14 @@ export default {
       this.entitiesID.push(circleEntity.id);
 
       this.rtmpList.forEach((item) => {
+        const isHigh = ~item.mp_name.indexOf("高位");
         const videoPointEntity = new Cesium.Entity({
           id: `normalpoint_${item.mp_id}`,
           position: Cesium.Cartesian3.fromDegrees(Number(item.lng), Number(item.lat), 3),
           billboard: {
-            image: "/static/images/map-ico/视频监控.png",
-            width: 40,
-            height: 40,
+            image: `/static/images/map-ico/${isHigh ? "火车站" : "视频监控"}.png`,
+            width: isHigh ? 50 : 40,
+            height: isHigh ? 50 : 40,
             disableDepthTestDistance: Number.POSITIVE_INFINITY,
           },
           name: item.mp_name,
