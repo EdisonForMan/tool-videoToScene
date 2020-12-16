@@ -171,10 +171,12 @@ export default {
       this.$bus.$off("cesium-3d-normalPointClick");
       this.$bus.$on("cesium-3d-normalPointClick", (item) => {
         this.isCircleVideo = false;
+        const mp_id = item.mp_id.split("normalpoint_")[1];
         this.fixRtmpList.length &&
           this.openRtmpVideoFrame({
             mp_name: item.mp_name,
-            mp_id: item.mp_id.split("normalpoint_")[1],
+            mp_id,
+            position: this.rtmpList.filter((v) => v.mp_id == mp_id)[0],
           });
         this.doRtmpListFrame = true;
       });
@@ -183,7 +185,7 @@ export default {
      * 赋值 开视频
      * @param {object} item
      */
-    async openRtmpVideoFrame({ mp_name, mp_id }) {
+    async openRtmpVideoFrame({ mp_name, mp_id, position }) {
       this.forceRtmpVideo = mp_name;
       if (!mp_id) {
         this.$message({
@@ -192,7 +194,7 @@ export default {
         });
       } else {
         const { data } = await getRtmpVideoURL(mp_id);
-        this.SetOnMapVideo({ mp_id, ...data });
+        this.SetOnMapVideo({ mp_id, mp_name, position, ...data });
       }
 
       // this.RtmpVideoURL = undefined;
@@ -241,7 +243,7 @@ export default {
       this.rtmpList.forEach((item) => {
         const videoPointEntity = new Cesium.Entity({
           id: `normalpoint_${item.mp_id}`,
-          position: Cesium.Cartesian3.fromDegrees(Number(item.lng), Number(item.lat), 2),
+          position: Cesium.Cartesian3.fromDegrees(Number(item.lng), Number(item.lat), 3),
           billboard: {
             image: "/static/images/map-ico/视频监控.png",
             width: 40,

@@ -1,5 +1,6 @@
 <template>
   <div class="videoDemoPlayer" :class="{ video_visi: onMapVideoForceId != id }">
+    <p>{{ rtspData.mp_name }}</p>
     <div class="demonstration">
       <span>角度: {{ rotate / 100 }} </span>
       <span class="video-silder">
@@ -10,6 +11,7 @@
           @change="(value) => setVideoRotate(value)"
         />
       </span>
+      <span class="release-video" @click="initRtmp">刷新</span>
       <span class="release-video" @click="releaseVideo">关闭视频</span>
     </div>
     <div :id="id" class="frequency-pic type1" />
@@ -50,7 +52,8 @@ export default {
   methods: {
     ...mapActions("map", ["DeleteOnMapVideo", "SetOnMapVideoForceId"]),
     initRtmp() {
-      this.video = undefined;
+      this.video && this.video.dispose();
+      this.video && (this.video = undefined);
       this.video = new Aliplayer(
         {
           id: this.id,
@@ -78,28 +81,37 @@ export default {
       );
     },
     initVideoToMap() {
-      window.etys[this.id] = window.earth.entities.add({
-        id: this.id,
-        polygon: {
-          hierarchy: new Cesium.PolygonHierarchy(
-            Cesium.Cartesian3.fromDegreesArray([
-              120.698893798466,
-              28.001919490126,
-              120.698012161289,
-              28.0018447184291,
-              120.697656034724,
-              28.0028060447815,
-              120.698349855701,
-              28.0030819575945,
-            ])
-          ),
-          height: 1,
-          stRotation: 1.2,
-          material: document.getElementById(this.id).children[0],
-        },
-        classificationType: Cesium.ClassificationType.BOTH,
-      });
-      this.rotate = window.etys[this.id].polygon.stRotation.getValue() * 100;
+      const { lng, lat } = this.rtspData.position;
+      let x = parseFloat(lng);
+      let y = parseFloat(lat);
+      if (window.etys[this.id]) {
+        window.etys[this.id].polygon.material = document.getElementById(
+          this.id
+        ).children[0];
+      } else {
+        window.etys[this.id] = window.earth.entities.add({
+          id: this.id,
+          polygon: {
+            hierarchy: new Cesium.PolygonHierarchy(
+              Cesium.Cartesian3.fromDegreesArray([
+                (x -= 0.002),
+                y,
+                x,
+                (y -= 0.0012),
+                (x += 0.002),
+                y,
+                x,
+                (y += 0.0012),
+              ])
+            ),
+            height: 2,
+            stRotation: 0,
+            material: document.getElementById(this.id).children[0],
+          },
+          classificationType: Cesium.ClassificationType.BOTH,
+        });
+        this.rotate = window.etys[this.id].polygon.stRotation.getValue() * 100;
+      }
     },
     setVideoRotate() {
       window.etys[this.id].polygon.stRotation.setValue(this.rotate / 100);
@@ -125,6 +137,9 @@ export default {
   border-radius: 10px;
   &.video_visi {
     visibility: hidden;
+  }
+  > p {
+    color: white;
   }
   .frequency-pic {
     height: 200px;

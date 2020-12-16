@@ -6,8 +6,8 @@ const BOUNDS = {
     south: 27.984375,
     north: 28.031321,
 };
-const verIndex = 0.004;
-const herIndex = 0.004;
+const verIndex = 0.003;
+const herIndex = 0.003;
 /**
  * 选中视频
  * @param {*} id 
@@ -109,21 +109,21 @@ export const drawLuChengOPoints = () => {
             disableDepthTestDistance: Number.POSITIVE_INFINITY,
             position,
         })
-        window.labelMap['luchengPoints'].add({
-            id: "Lucheng_label_" + i,
-            text: `${X} , ${Y}`,
-            fillColor: Cesium.Color.WHITE,
-            outlineColor: Cesium.Color.BLACK,
-            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-            font: "10px",
-            scale: 1,
-            outlineWidth: 4,
-            showBackground: true,
-            backgroundColor: Cesium.Color(0.165, 0.165, 0.165, 0.1),
-            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
-            pixelOffset: new Cesium.Cartesian2(0, -30),
-            disableDepthTestDistance: Number.POSITIVE_INFINITY,
-            position
-        });
+        // window.labelMap['luchengPoints'].add({
+        //     id: "Lucheng_label_" + i,
+        //     text: `${X} , ${Y}`,
+        //     fillColor: Cesium.Color.WHITE,
+        //     outlineColor: Cesium.Color.BLACK,
+        //     style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        //     font: "10px",
+        //     scale: 1,
+        //     outlineWidth: 4,
+        //     showBackground: true,
+        //     backgroundColor: Cesium.Color(0.165, 0.165, 0.165, 0.1),
+        //     distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
+        //     pixelOffset: new Cesium.Cartesian2(0, -30),
+        //     disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        //     position
+        // });
     })
 }

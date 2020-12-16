@@ -237,13 +237,11 @@ export const SetForceTrueTopicLabelId = ({ commit }, data) => {
 export const SetOnMapVideo = ({ commit }, data) => {
   const onMapVideo = JSON.parse(JSON.stringify(state.onMapVideo));
   onMapVideo[data.mp_id] = data;
-  console.log('add', onMapVideo)
   commit(types.SET_ON_MAP_VIDEO, onMapVideo);
 }
 export const DeleteOnMapVideo = ({ commit }, data) => {
   const onMapVideo = JSON.parse(JSON.stringify(state.onMapVideo));
   delete onMapVideo[data.mp_id];
-  console.log('delete', onMapVideo)
   commit(types.SET_ON_MAP_VIDEO, onMapVideo);
 }
 //  设置视频编辑ID
