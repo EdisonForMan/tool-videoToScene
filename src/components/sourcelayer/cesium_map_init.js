@@ -116,6 +116,20 @@ export const mapRoadLampLayerTurn = (boolean) => {
 }
 
 /**
+ * S1路线叠加
+ * @param {*} param0 
+ */
+export const mapS1RoadInit = (url, name) => {
+    return new Promise((resolve, reject) => {
+        window.earth.scene.addS3MTilesLayerByScp(url, {
+            name,
+        })
+        resolve(true);
+    })
+
+}
+
+/**
  * 白模叠加初始化
  * @param {*} arrURL 
  */

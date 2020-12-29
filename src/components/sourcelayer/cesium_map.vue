@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { ServiceUrl } from "config/server/mapConfig";
+import { ServiceUrl, ExtraSourceURL } from "config/server/mapConfig";
 import CesiumMapVideo from "components/sourcelayer/extraModel/CesiumMapVideo/CesiumMapVideo";
 import DetailPopup from "components/sourcelayer/commonFrame/Popups/DetailPopup";
 import RtmpVideo from "components/sourcelayer/extraModel/RtmpVideo/RtmpVideo";
@@ -38,10 +38,8 @@ import {
   mapConfigInit,
   mapImageLayerInit,
   mapMvtLayerInit,
-  mapRiverLayerInit,
   mapBaimoLayerInit,
-  mapRoadLampLayerInit,
-  mapRoadLampLayerTurn,
+  mapS1RoadInit,
 } from "components/sourcelayer/cesium_map_init";
 import { mapGetters } from "vuex";
 const Cesium = window.Cesium;
@@ -154,15 +152,13 @@ export default {
       //  大数据地图
       window.datalayer = mapImageLayerInit(ServiceUrl.SWImage);
       //  地图注记
-      // const mapMvt = mapMvtLayerInit("mapMvt", ServiceUrl.YJMVT);
-      //  重要地物注记
       // const keyMvt = mapMvtLayerInit("keyMvt", ServiceUrl.KEYMVT);
       //  画鹿城点
       drawLuChengOPoints();
       //  白模叠加
       await mapBaimoLayerInit(ServiceUrl.WZBaimo_OBJ);
-      //  路灯、光源叠加
-      // mapRoadLampLayerInit();
+      //  S1线叠加
+      await mapS1RoadInit(ExtraSourceURL.S1, "s1Road");
       //  回调钩子
       fn && fn();
     },
