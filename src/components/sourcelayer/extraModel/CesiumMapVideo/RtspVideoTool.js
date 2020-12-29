@@ -3,7 +3,7 @@ import { add } from "ol/coordinate";
 const BOUNDS = {
     west: 120.58254,
     east: 120.738342,
-    south: 27.984375,
+    south: 27.964375,
     north: 28.031321,
 };
 const verIndex = 0.003;
@@ -103,8 +103,8 @@ export const drawLuChengOPoints = () => {
         window.billboardMap['luchengPoints'].add({
             id: "Lucheng_" + i,
             pixelSize: 8,
-            color: Cesium.Color.YELLOW,
-            outlineColor: Cesium.Color.RED,
+            color: Cesium.Color.WHITE,
+            outlineColor: Cesium.Color.GRAY,
             outlineWidth: 3,
             disableDepthTestDistance: Number.POSITIVE_INFINITY,
             position,
