@@ -4,7 +4,7 @@
  * @LastEditTime: 2020-09-03 21:24:20
  * @LastEditors: eds
  * @Description:
- * @FilePath: \wz-city-culture-tour\src\components\sourcelayer\commonFrame\tourPointPopup.vue
+ * @FilePath: \wz-city-culture-tour\src\components\projection\commonFrame\tourPointPopup.vue
 -->
 <template>
   <div id="trackPopUp" v-if="shallPop">

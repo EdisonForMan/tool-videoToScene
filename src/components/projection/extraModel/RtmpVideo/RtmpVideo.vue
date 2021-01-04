@@ -4,7 +4,7 @@
  * @LastEditTime: 2020-09-15 10:53:32
  * @LastEditors: eds
  * @Description:
- * @FilePath: \wz-city-culture-tour\src\components\sourcelayer\extraModel\RtmpVideo\RtmpVideo.vue
+ * @FilePath: \wz-city-culture-tour\src\components\projection\extraModel\RtmpVideo\RtmpVideo.vue
 -->
 <template>
   <div class="rtmpVideo">

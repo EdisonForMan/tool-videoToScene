@@ -4,7 +4,7 @@
  * @LastEditTime: 2020-09-15 11:07:30
  * @LastEditors: eds
  * @Description:
- * @FilePath: \wz-city-culture-tour\src\components\sourcelayer\treeTool\searchBox.vue
+ * @FilePath: \wz-city-culture-tour\src\components\projection\treeTool\searchBox.vue
 -->
 <template>
   <div class="search-box" v-show="searchBoxVisible">

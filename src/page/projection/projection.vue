@@ -6,7 +6,7 @@
   </div>
 </template>
 <script>
-import CesiumMap from "components/projection/cesium_map";
+import CesiumMap from "components/projection/projection_map";
 import { mapGetters, mapActions } from "vuex";
 
 export default {

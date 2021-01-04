@@ -1,5 +1,3 @@
-import { add } from "ol/coordinate";
-
 const BOUNDS = {
     west: 120.58254,
     east: 120.738342,
@@ -109,21 +107,5 @@ export const drawLuChengOPoints = () => {
             disableDepthTestDistance: Number.POSITIVE_INFINITY,
             position,
         })
-        // window.labelMap['luchengPoints'].add({
-        //     id: "Lucheng_label_" + i,
-        //     text: `${X} , ${Y}`,
-        //     fillColor: Cesium.Color.WHITE,
-        //     outlineColor: Cesium.Color.BLACK,
-        //     style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-        //     font: "10px",
-        //     scale: 1,
-        //     outlineWidth: 4,
-        //     showBackground: true,
-        //     backgroundColor: Cesium.Color(0.165, 0.165, 0.165, 0.1),
-        //     distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
-        //     pixelOffset: new Cesium.Cartesian2(0, -30),
-        //     disableDepthTestDistance: Number.POSITIVE_INFINITY,
-        //     position
-        // });
     })
 }

@@ -4,7 +4,7 @@
  * @LastEditTime: 2020-09-15 11:01:20
  * @LastEditors: eds
  * @Description:
- * @FilePath: \wz-city-culture-tour\src\components\sourcelayer\cesium_map.vue
+ * @FilePath: \wz-city-culture-tour\src\components\projection\cesium_map.vue
 -->
 <template>
   <div class="cesiumContainer">
@@ -23,9 +23,9 @@
 
 <script>
 import { ServiceUrl, ExtraSourceURL } from "config/server/mapConfig";
-import CesiumMapVideo from "components/sourcelayer/extraModel/CesiumMapVideo/CesiumMapVideo";
-import DetailPopup from "components/sourcelayer/commonFrame/Popups/DetailPopup";
-import RtmpVideo from "components/sourcelayer/extraModel/RtmpVideo/RtmpVideo";
+import CesiumMapVideo from "components/projection/extraModel/CesiumMapVideo/CesiumMapVideo";
+import DetailPopup from "components/projection/commonFrame/Popups/DetailPopup";
+import RtmpVideo from "components/projection/extraModel/RtmpVideo/RtmpVideo";
 import { CenterPoint } from "mock/overview.js";
 import {
   forceOnEntity,
@@ -40,7 +40,7 @@ import {
   mapMvtLayerInit,
   mapBaimoLayerInit,
   mapS1RoadInit,
-} from "components/sourcelayer/cesium_map_init";
+} from "components/projection/cesium_map_init";
 import { mapGetters } from "vuex";
 const Cesium = window.Cesium;
 
