@@ -27,13 +27,7 @@ import CesiumMapVideo from "components/projection/extraModel/CesiumMapVideo/Cesi
 import DetailPopup from "components/projection/commonFrame/Popups/DetailPopup";
 import RtmpVideo from "components/projection/extraModel/RtmpVideo/RtmpVideo";
 import { CenterPoint } from "mock/overview.js";
-import {
-  forceOnEntity,
-  mouseDownForce,
-  mouseUpRelease,
-  mouseMove,
-  drawLuChengOPoints,
-} from "./extraModel/CesiumMapVideo/RtspVideoTool";
+import { drawLuChengOPoints } from "./extraModel/CesiumMapVideo/RtspVideoTool";
 import {
   mapConfigInit,
   mapImageLayerInit,
@@ -66,7 +60,8 @@ export default {
     //  点位label hash
     window.labelMap = {};
     //  视频调整
-    window.etys = {};
+    window.projections = {};
+    window.handlers = {};
     window.etyEdits = undefined;
     window.forceDragObject = undefined;
     window.doDragFlag = undefined;
@@ -101,14 +96,9 @@ export default {
             this.$bus.$emit("cesium-3d-video-force-id", {
               id: pick.id.id.replace("normalpoint_", "Rtsp"),
             });
-          } else if (pick.id.id && ~pick.id.id.indexOf("Rtsp")) {
-            forceOnEntity(pick.id.id);
-            this.$bus.$emit("cesium-3d-video-force-id", {
-              id: pick.id.id,
-            });
           }
         } else if (typeof pick.id == "string") {
-          //  *****[detailPopup]  资源详情点*****
+          //  *****[detailPopup]  规则分布鹿城分割点*****
           if (~pick.id.indexOf("Lucheng")) {
             this.$refs.detailPopup.getForceEntity({
               id: pick.id,
@@ -117,18 +107,6 @@ export default {
           }
         }
       }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-      // 监听左键按下事件
-      handler.setInputAction((e) => {
-        mouseDownForce(e);
-      }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
-      // 监听左键抬起事件
-      handler.setInputAction((e) => {
-        mouseUpRelease(e);
-      }, Cesium.ScreenSpaceEventType.LEFT_UP);
-      // 监听左键移动事件
-      handler.setInputAction((e) => {
-        mouseMove(e);
-      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     },
     /**
      * 事件注册

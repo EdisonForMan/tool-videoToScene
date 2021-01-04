@@ -39,7 +39,7 @@ export default {
 
     /**
      * 仅传参数给RtmpVideo组件,不参与后续功能
-     * @param {object} param0 该医疗点的对象信息
+     * @param {object} param0 该视频点的对象信息
      */
     doVideoRtmp() {
       const { id } = this.forceEntity;

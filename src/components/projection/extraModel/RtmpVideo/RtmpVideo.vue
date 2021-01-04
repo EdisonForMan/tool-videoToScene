@@ -7,98 +7,7 @@
  * @FilePath: \wz-city-culture-tour\src\components\projection\extraModel\RtmpVideo\RtmpVideo.vue
 -->
 <template>
-  <div class="rtmpVideo">
-    <!-- <div class="rtmpListFrame" v-if="doRtmpListFrame">
-      <header>
-        <span>现场视频</span> /
-        <span>{{ RtmpForcePoint.shortname }}</span>
-        <i class="close" @click="closeRtmpVideoFrame"></i>
-      </header>
-      <div class="rtmpVideoContent">
-        <div class="rtmpVideoList">
-          <header>
-            周边
-            <el-select
-              v-if="!isCircleVideo"
-              class="rtmp-video-range"
-              v-model="radiusRange"
-              @change="refreshRtmpVideoList"
-              placeholder="范围"
-            >
-              <el-option
-                v-for="item in radiusOption"
-                :key="item"
-                :label="item"
-                :value="item"
-              >
-              </el-option>
-            </el-select>
-            <i v-if="isCircleVideo">{{ radiusRange }}</i>
-            米
-            <i>({{ fixRtmpList.length }})</i>
-            <el-switch v-model="isHightVideo" name="高位" active-text="高位" />
-            <span
-              @click="videoOfPrivate = !videoOfPrivate"
-              :class="{ active: videoOfPrivate }"
-              >私有监控</span
-            >
-            <span
-              @click="videoOfPublic = !videoOfPublic"
-              :class="{ active: videoOfPublic }"
-              >公有监控</span
-            >
-          </header>
-          <div>
-            <ul>
-              <li
-                v-for="(item, index) in fixRtmpList"
-                :class="[forceRtmpVideo == item.mp_name ? 'rtmp_active' : '']"
-                :key="index"
-                @click="openRtmpVideoFrame(item)"
-              >
-                <span>
-                  <input
-                    id="custom-checkbox"
-                    type="checkbox"
-                    :checked="forceRtmpVideo === item.mp_name"
-                    @click="checkUniqueVideo(item)"
-                  />
-                </span>
-                <span :title="item.mp_name"
-                  >{{ index + 1 }}.{{ item.mp_name }}</span
-                >
-                <span>{{ item.dist }} 米</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="rtmpVideoFrame">
-          <header>
-            <p>{{ forceRtmpVideo }}</p>
-            <span
-              @click="videoSourceTop = false"
-              :class="{ active: !videoSourceTop }"
-              >Flash模式</span
-            >
-            <span
-              @click="videoSourceTop = true"
-              :class="{ active: videoSourceTop }"
-              >H5模式</span
-            >
-          </header>
-          <div>
-            <flv
-              v-if="RtmpVideoURL"
-              :url="RtmpVideoURL"
-              :mode="RtmpVideoMode"
-              :type="videoSourceTop"
-            />
-            <p v-if="!RtmpVideoURL">正在获取视频内容...</p>
-          </div>
-        </div>
-      </div>
-    </div> -->
-  </div>
+  <div class="rtmpVideo" />
 </template>
 
 <script>
@@ -111,8 +20,6 @@ export default {
   data() {
     return {
       doRtmpListFrame: false,
-      RtmpVideoURL: undefined, //  视频地址
-      RtmpVideoMode: "flash", // 视频模式
       forceRtmpVideo: undefined, //  正在看的视频名
       RtmpForcePoint: {}, //  保存点击的entity属性
       radiusRange: 200, //  默认半径200米
@@ -158,8 +65,6 @@ export default {
         this.RtmpForcePoint = item;
         const { data } = await getRtmpVideoList(item.geometry, this.radiusRange);
         this.SetRtmpList(data);
-        // data.length && this.openRtmpVideoFrame(data[0]);
-        // this.doRtmpListFrame = true;
         this.removeVideoCircle();
         this.drawVideoCircle(item.geometry, this.radiusRange);
       });
@@ -196,14 +101,6 @@ export default {
         const { data } = await getRtmpVideoURL(mp_id);
         this.SetOnMapVideo({ mp_id, mp_name, position, ...data });
       }
-
-      // this.RtmpVideoURL = undefined;
-      // this.RtmpVideoMode = "flash";
-      // data &&
-      //   this.$nextTick(() => {
-      //     this.RtmpVideoURL = data.flv;
-      //     this.RtmpVideoMode = data.play_mode;
-      //   });
     },
     async refreshRtmpVideoList() {
       const { data } = await getRtmpVideoList(
@@ -280,8 +177,6 @@ export default {
     closeRtmpVideoFrame() {
       this.doRtmpListFrame = false;
       this.forceRtmpVideo = undefined;
-      this.RtmpVideoURL = undefined;
-      this.RtmpVideoMode = "flash";
       this.RtmpForcePoint = {};
     },
   },

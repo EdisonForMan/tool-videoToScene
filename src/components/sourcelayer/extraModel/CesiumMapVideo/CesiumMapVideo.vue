@@ -1,11 +1,11 @@
 <template>
   <div class="rtspVideo">
-    <Rtsp1 v-for="(value, key, index) in onMapVideo" :key="index" :rtspData="value" />
+    <Rtsp v-for="(value, key, index) in onMapVideo" :key="index" :rtspData="value" />
   </div>
 </template>
 
 <script>
-import Rtsp1 from "./Rtsp1";
+import Rtsp from "./Rtsp";
 import { mapGetters, mapActions } from "vuex";
 export default {
   name: "rtspVideo",
@@ -16,7 +16,7 @@ export default {
     this.eventRegsiter();
     this.initLayer();
   },
-  components: { Rtsp1 },
+  components: { Rtsp },
   beforeDestroy() {},
   methods: {
     ...mapActions("map", ["SetOnMapVideoForceId"]),

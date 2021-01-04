@@ -6,7 +6,7 @@ import window_array from "config/local/windowPositions";
  * 地图参数调节
  */
 export const mapConfigInit = () => {
-    window.earth.scene.globe.depthTestAgainstTerrain = false;
+    // window.earth.scene.globe.depthTestAgainstTerrain = false;
     // window.earth.scene.debugShowFramesPerSecond = true;
     window.earth.clock.currentTime.secondsOfDay = 39279.36380499996
     // window.earth.scene.fxaa = true;
