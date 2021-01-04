@@ -16,19 +16,30 @@ const router = new Router({
   routes: [
     {
       path: "/",
-      redirect: "sourcelayer"
+      redirect: "videoprojection"
     },
     {
-      path: "/sourcelayer", // 医疗
-      name: "sourcelayer",
+      path: "/videotool", // 平面调整
+      name: "videotool",
       meta: {
         title: "视频映射工具"
       },
       component: resolve => require(["page/sourcelayer/sourcelayer"], resolve)
     },
+    {
+      path: "/videoprojection", // 三维投影
+      name: "videoprojection",
+      meta: {
+        title: "视频投射工具"
+      },
+      component: resolve => require(["page/projection/projection"], resolve)
+    },
   ]
 });
 
+/**
+ * 设置文档名
+ */
 router.beforeEach((to, from, next) => {
   if (to.meta.title) {
     document.title = to.meta.title;
