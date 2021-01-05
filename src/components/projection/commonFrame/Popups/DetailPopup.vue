@@ -21,19 +21,14 @@ export default {
     this.eventRegsiter();
   },
   methods: {
-    eventRegsiter() {
-      this.$bus.$on("cesium-3d-detail-pop-clear", () => {
-        this.closePopup();
-      });
-    },
+    eventRegsiter() {},
     /**
      *  详情点赋值
      *  @param {object} forceEntity 详情点信息
      */
     getForceEntity(forceEntity) {
       this.forceEntity = forceEntity;
-      this.buffer = null;
-      this.$bus.$emit("cesium-3d-rtmpFetch-cb");
+      //  画缓冲区
       this.doVideoRtmp();
     },
 
@@ -48,9 +43,6 @@ export default {
         shortname: id,
         geometry: { lng: x, lat: y },
       });
-    },
-    closePopup() {
-      this.$bus.$emit("cesium-3d-rtmpFetch-cb");
     },
   },
 };

@@ -14,14 +14,12 @@
 const Cesium = window.Cesium;
 import { mapGetters, mapActions } from "vuex";
 import { getRtmpVideoList, getRtmpVideoURL } from "api/cityBrainAPI";
-import flv from "./Flv";
 
 export default {
   data() {
     return {
       doRtmpListFrame: false,
       forceRtmpVideo: undefined, //  正在看的视频名
-      RtmpForcePoint: {}, //  保存点击的entity属性
       radiusRange: 200, //  默认半径200米
       radiusOption: [100, 200, 500, 1000],
       videoSourceTop: true,
@@ -33,21 +31,8 @@ export default {
       entitiesID: [],
     };
   },
-  components: {
-    flv,
-  },
   computed: {
-    ...mapGetters("map", ["rtmpList", "rtmpListOther"]),
-    fixRtmpList() {
-      const arr = [
-        this.videoOfPrivate ? false : undefined,
-        this.videoOfPublic ? true : undefined,
-      ];
-      const isHightVideo = this.isHightVideo ? "高位" : "";
-      return (this.isCircleVideo ? this.rtmpListOther : this.rtmpList).filter(
-        (v) => ~arr.indexOf(v.private) && ~v.mp_name.indexOf(isHightVideo)
-      );
-    },
+    ...mapGetters("map", ["rtmpList"]),
   },
   async mounted() {
     this.eventRegsiter();
@@ -59,25 +44,20 @@ export default {
       const that = this;
       this.$bus.$off("cesium-3d-rtmpFetch");
       this.$bus.$on("cesium-3d-rtmpFetch", async (item) => {
-        //  code fetch rtmpURLs
-        this.isCircleVideo = false;
-        this.isHightVideo = false;
-        this.RtmpForcePoint = item;
+        //  移除缓冲区与视频图标
+        this.removeVideoCircle();
+        //  获取缓冲区内视频列表
         const { data } = await getRtmpVideoList(item.geometry, this.radiusRange);
+        //  设置store视频列表数据
         this.SetRtmpList(data);
-        this.removeVideoCircle();
+        //  画缓冲区与视频图标
         this.drawVideoCircle(item.geometry, this.radiusRange);
-      });
-      this.$bus.$off("cesium-3d-rtmpFetch-cb");
-      this.$bus.$on("cesium-3d-rtmpFetch-cb", () => {
-        this.removeVideoCircle();
       });
       // 图层监控视频点
       this.$bus.$off("cesium-3d-normalPointClick");
       this.$bus.$on("cesium-3d-normalPointClick", (item) => {
-        this.isCircleVideo = false;
         const mp_id = item.mp_id.split("normalpoint_")[1];
-        this.fixRtmpList.length &&
+        this.rtmpList.length &&
           this.openRtmpVideoFrame({
             mp_name: item.mp_name,
             mp_id,
@@ -102,16 +82,6 @@ export default {
         this.SetOnMapVideo({ mp_id, mp_name, position, ...data });
       }
     },
-    async refreshRtmpVideoList() {
-      const { data } = await getRtmpVideoList(
-        this.RtmpForcePoint.geometry,
-        this.radiusRange
-      );
-      this.SetRtmpList(data);
-      this.removeVideoCircle();
-      this.drawVideoCircle(this.RtmpForcePoint.geometry, this.radiusRange);
-      // data.length && this.openRtmpVideoFrame(data[0]);
-    },
     /**
      * 画缓冲区
      * @param {string!|number!} 没id不画
@@ -119,7 +89,7 @@ export default {
      * @param {queryRadius!} 监控点查询半径
      */
     async drawVideoCircle({ lng, lat }, queryRadius = 200) {
-      // 画圈
+      //  画圈
       console.log("[drawVideoCircle]", lng, lat, queryRadius);
       const circleEntity = new Cesium.Entity({
         position: Cesium.Cartesian3.fromDegrees(lng, lat, 0),
@@ -136,7 +106,7 @@ export default {
       });
       window.earth.entities.add(circleEntity);
       this.entitiesID.push(circleEntity.id);
-
+      //  画点
       this.rtmpList.forEach((item) => {
         const isHigh = ~item.mp_name.indexOf("高位");
         const videoPointEntity = new Cesium.Entity({
@@ -163,21 +133,6 @@ export default {
         window.earth.entities.removeById(item);
       });
       this.entitiesID = [];
-    },
-    /**
-     * 保持单一选中
-     * @param {object} item 视频单例
-     */
-    checkUniqueVideo({ mp_name }) {
-      this.forceRtmpVideo = mp_name;
-    },
-    /**
-     * 关frame 清状态
-     */
-    closeRtmpVideoFrame() {
-      this.doRtmpListFrame = false;
-      this.forceRtmpVideo = undefined;
-      this.RtmpForcePoint = {};
     },
   },
 };
