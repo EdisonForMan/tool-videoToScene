@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <loading v-show="isLoading"></loading>
     <div class="content">
       <router-view />
     </div>
@@ -8,62 +7,14 @@
 </template>
 
 <script>
-import Loading from "components/loading/loading";
-import { getUserInfo } from "./api/public/public";
-import { mapGetters, mapActions, mapState } from "vuex";
-import { getRoleCategory } from "api/map/map";
-import category from "mock/category";
 export default {
   name: "App",
-  components: {
-    // MHeader,
-    Loading,
-  },
-  data() {
-    return {
-      nameList: [],
-      // onMessage: false,
-    };
-  },
-  computed: {
-    ...mapGetters(["userInfo"]),
-    ...mapState({
-      isLoading: "isLoading",
-    }),
-  },
-  created() {
-    // 监听父窗口事件
-    window.addEventListener(
-      "message",
-      (e) => {
-        let data = e.data;
-        if (!data.layer) return;
-        console.log("message", e);
-        window._POST_MESSAGE_ = data.layer;
-        this.$bus.$emit("source-message");
-      },
-      false
-    );
-  },
-  mounted() {
-    // getUserInfo().then(data => {
-    //   if (data.districtName !== this.userInfo.districtName) {
-    //     this.$router.push("/map");
-    //   }
-    //   this.SetUserInfo(data);
-    //   document.getElementsByTagName("title")[0].innerText =
-    //     "温州设计集团大数据可视化分析基础平台";
-    // });
-    // getRoleCategory().then(res => {
-    //   // this.getName(category);
-    //   this.getName(res);
-    //   this.SetNameList(this.nameList);
-    // });
-  },
-  methods: {
-    ...mapActions(["SetUserInfo", "changeLoad", "SetResize"]),
-    ...mapActions("map", ["SetNameList"]),
-  },
+  components: {},
+  data() {},
+  computed: {},
+  created() {},
+  mounted() {},
+  methods: {},
 };
 </script>
 

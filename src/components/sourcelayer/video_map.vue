@@ -101,11 +101,6 @@ export default {
             this.$bus.$emit("cesium-3d-video-force-id", {
               id: pick.id.id.replace("normalpoint_", "Rtsp"),
             });
-          } else if (pick.id.id && ~pick.id.id.indexOf("Rtsp")) {
-            forceOnEntity(pick.id.id);
-            this.$bus.$emit("cesium-3d-video-force-id", {
-              id: pick.id.id,
-            });
           }
         } else if (typeof pick.id == "string") {
           //  *****[detailPopup]  资源详情点*****

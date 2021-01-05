@@ -18,15 +18,9 @@ import { getRtmpVideoList, getRtmpVideoURL } from "api/cityBrainAPI";
 export default {
   data() {
     return {
-      doRtmpListFrame: false,
       forceRtmpVideo: undefined, //  正在看的视频名
       radiusRange: 200, //  默认半径200米
       radiusOption: [100, 200, 500, 1000],
-      videoSourceTop: true,
-      videoOfPrivate: true,
-      videoOfPublic: true,
-      isCircleVideo: false,
-      isHightVideo: false,
       //  激活列表
       entitiesID: [],
     };
@@ -63,7 +57,6 @@ export default {
             mp_id,
             position: this.rtmpList.filter((v) => v.mp_id == mp_id)[0],
           });
-        this.doRtmpListFrame = true;
       });
     },
     /**
@@ -139,222 +132,7 @@ export default {
 </script>
 
 <style lang="less">
-.rtmp-video-range {
-  width: unset !important;
-  > .el-input {
-    > .el-input__inner {
-      padding: 1vh 0.6vh !important;
-      height: 2vh !important;
-      line-height: 2vh !important;
-      width: 5.8vh;
-      font-size: 1.4vh;
-    }
-    > .el-input__suffix {
-      right: 0vh;
-      > .el-input__suffix-inner {
-        > .el-input__icon {
-          height: unset !important;
-          width: 2vh !important;
-          line-height: unset !important;
-        }
-        > .el-select__caret {
-          &::before {
-            color: black;
-            font-size: 1vh;
-          }
-        }
-      }
-    }
-  }
-}
 .rtmpVideo {
-  .rtmpListFrame {
-    height: 55vh;
-    width: 128vh;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -60%);
-    background-size: 100% 100%;
-    background-image: url("/static/images/common/rtmp-frame.png");
-    box-sizing: border-box;
-    padding: 2.6vh 4.4vh 2vh 4.4vh;
-    z-index: 12;
-    color: white;
-    > header {
-      height: 4vh;
-      line-height: 4vh;
-      > span {
-        font-size: 1.8vh;
-      }
-      .close {
-        position: absolute;
-        right: 46px;
-        top: 24px;
-        width: 2.6vh;
-        height: 2.6vh;
-        display: block;
-        .bg-image("/static/images/icons/zoom-in");
-        transform: rotate(-45deg);
-        transition: all 0.1s linear;
-        cursor: pointer;
-        z-index: 10;
-
-        &:hover {
-          transform: rotate(45deg);
-        }
-      }
-    }
-    .rtmpVideoContent {
-      height: 46vh;
-      display: flex;
-      > div {
-        height: 100%;
-        display: inline-block;
-      }
-      .rtmpVideoList {
-        width: 44vh;
-        display: flex;
-        flex-direction: column;
-        box-sizing: border-box;
-        // 选择栏
-        > header {
-          height: 2.4vh;
-          line-height: 2.2vh;
-          font-size: 1.7vh;
-          overflow: hidden;
-          > i {
-            font-size: 0.8em;
-            color: #2acbfe;
-            font-style: normal;
-          }
-          > span {
-            float: right;
-            cursor: pointer;
-            font-size: 1.6vh;
-            line-height: 2.4vh;
-            padding: 0 6px;
-            display: inline-block;
-            background-image: linear-gradient(
-              to bottom,
-              #032648 0%,
-              #053867 23%,
-              #003a6b 81%,
-              #00192e 100%
-            );
-            &:last-child {
-              margin-right: 6px;
-            }
-            &.active {
-              background-image: linear-gradient(
-                to bottom,
-                #4c97e3 0%,
-                rgba(23, 83, 145, 0.75) 67%,
-                rgba(5, 45, 88, 0.29) 100%
-              );
-            }
-          }
-        }
-        > div {
-          flex: 1;
-          overflow: hidden;
-          box-sizing: border-box;
-          padding-top: 6px;
-          > ul {
-            height: 100%;
-            overflow-x: hidden;
-            overflow-y: auto;
-            box-sizing: border-box;
-            padding-right: 4px;
-            .rtmp_active {
-              background-image: linear-gradient(to right, #2acbfe 0%, #002a38 100%);
-            }
-            > li {
-              cursor: pointer;
-              line-height: 2.6vh;
-              height: 2.6vh;
-              font-size: 1.6vh;
-              background-color: rgba(1, 31, 43, 0.51);
-              margin-bottom: 1px;
-              display: flex;
-              box-sizing: border-box;
-              padding-right: 8px;
-              &:hover {
-                background-image: linear-gradient(to right, #2acbfe 0%, #002a38 100%);
-              }
-              > span {
-                display: inline-block;
-                &:nth-child(2) {
-                  flex: 1;
-                  white-space: nowrap; /* 规定文本是否折行 */
-                  overflow: hidden; /* 规定超出内容宽度的元素隐藏 */
-                  text-overflow: ellipsis;
-                }
-                &:last-child {
-                  width: 7vh;
-                  text-align: right;
-                  font-size: 1.3vh;
-                  letter-spacing: 0px;
-                  color: #2acbfe;
-                }
-              }
-            }
-          }
-        }
-      }
-      .rtmpVideoFrame {
-        flex: 1;
-        box-sizing: border-box;
-        padding-left: 10px;
-        display: flex;
-        flex-direction: column;
-        > header {
-          height: 2.4vh;
-          line-height: 2.4vh;
-          font-size: 1.6vh;
-          overflow: hidden;
-          > p {
-            display: inline-block;
-            max-width: 50vh;
-            line-height: 2.4vh;
-            white-space: nowrap; /* 规定文本是否折行 */
-            overflow: hidden; /* 规定超出内容宽度的元素隐藏 */
-            text-overflow: ellipsis;
-          }
-          > span {
-            float: right;
-            cursor: pointer;
-            font-size: 1.6vh;
-            line-height: 2.4vh;
-            padding: 0 6px;
-            display: inline-block;
-            background-image: linear-gradient(
-              to bottom,
-              #032648 0%,
-              #053867 23%,
-              #003a6b 81%,
-              #00192e 100%
-            );
-            &:last-child {
-              margin-right: 6px;
-            }
-            &.active {
-              background-image: linear-gradient(
-                to bottom,
-                #4c97e3 0%,
-                rgba(23, 83, 145, 0.75) 67%,
-                rgba(5, 45, 88, 0.29) 100%
-              );
-            }
-          }
-        }
-        > div {
-          flex: 1;
-          box-sizing: border-box;
-          padding-top: 6px;
-        }
-      }
-    }
-  }
+  display: block;
 }
 </style>
