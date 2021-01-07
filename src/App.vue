@@ -9,12 +9,6 @@
 <script>
 export default {
   name: "App",
-  components: {},
-  data() {},
-  computed: {},
-  created() {},
-  mounted() {},
-  methods: {},
 };
 </script>
 

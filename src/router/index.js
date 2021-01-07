@@ -16,7 +16,7 @@ const router = new Router({
   routes: [
     {
       path: "/",
-      redirect: "videotool"
+      redirect: "videoprojection"
     },
     {
       path: "/videotool", // 平面调整

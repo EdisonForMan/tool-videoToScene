@@ -5,7 +5,13 @@
       <span class="release-video" @click="doProjection">投射</span>
       <span class="release-video" @click="clearProjection">清除</span>
       <span class="release-video" @click="initRtmp">刷新</span>
-      <span class="release-video" @click="releaseVideo">关闭视频</span>
+      <span class="release-video" @click="releaseVideo" :data-val="this.id"
+        >关闭视频</span
+      >
+    </div>
+    <div class="update-video">
+      <span class="release-video" @click="getVideoParams">获取视频参数</span>
+      <span class="release-video" @click="saveVideoParams">保存视频参数</span>
     </div>
     <div class="demonstration">
       <div class="demonstration-single">
@@ -59,13 +65,14 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { getRtmpVideoURL } from "api/cityBrainAPI";
+import { getVideoProjections, saveVideoProjections } from "api/videoAPI";
 const Aliplayer = window.Aliplayer;
 export default {
-  name: "",
   data() {
     return {
       video: undefined,
       videoTimer: undefined,
+      serverParams: undefined,
       //  参数
       pheight: 80,
       vdistance: 500,
@@ -78,7 +85,7 @@ export default {
     ...mapGetters("map", ["onMapVideoForceId"]),
   },
   created() {
-    this.id = "Rtsp" + this.rtspData.mp_id;
+    this.id = "Rtsp" + this.$props.rtspData.mp_id;
   },
   beforeDestroy() {
     this.video && this.video.dispose();
@@ -90,33 +97,37 @@ export default {
     clearInterval(this.videoTimer);
   },
   async mounted() {
-    this.initRtmp();
+    await this.initRtmp();
   },
   methods: {
     ...mapActions("map", ["DeleteOnMapVideo", "SetOnMapVideoForceId"]),
     initRtmp() {
-      this.video && this.video.dispose();
-      this.video && (this.video = undefined);
-      this.video = new Aliplayer(
-        {
-          id: this.id,
-          source: this.rtspData.flv,
-          width: "100%",
-          height: "200px",
-          autoplay: true,
-          controlBarVisibility: "hover",
-          useFlashPrism: false,
-          useH5Prism: true,
-        },
-        (player) => {
-          player.mute();
-          player.play();
-          this.initVideoToMap();
-          this.videoTimer = setInterval(() => {
-            this.video && player ? player.play() : clearInterval(this.videoTimer);
-          }, 1 * 60 * 1000);
-        }
-      );
+      return new Promise((resolve, reject) => {
+        this.video && this.video.dispose();
+        this.video && (this.video = undefined);
+        this.video = new Aliplayer(
+          {
+            id: this.id,
+            source: this.rtspData.flv,
+            width: "100%",
+            height: "200px",
+            autoplay: true,
+            controlBarVisibility: "hover",
+            useFlashPrism: false,
+            useH5Prism: true,
+          },
+          (player) => {
+            player.mute();
+            player.play();
+            console.log(player);
+            this.initVideoToMap();
+            this.videoTimer = setInterval(() => {
+              this.video && player ? player.play() : clearInterval(this.videoTimer);
+            }, 1 * 60 * 1000);
+            resolve(true);
+          }
+        );
+      });
     },
     doProjection() {
       window.handlers[this.id].clear();
@@ -189,9 +200,59 @@ export default {
       window.projections[this.id] && (window.projections[this.id].horizontalFov = value);
     },
     releaseVideo() {
+      this.clearAndActive();
       this.DeleteOnMapVideo(this.rtspData);
       this.SetOnMapVideoForceId(undefined);
     },
+    //  获取服务端视频数据
+    async getVideoParams() {
+      const { rows } = await getVideoProjections(this.id);
+      if (rows.length) {
+        this.serverParams = JSON.parse(rows[0].PARAMS);
+        this.doServerStyle();
+      } else {
+        this.$message({ message: "未找到已保存的视频系数" });
+      }
+    },
+    //  保存服务端视频数据
+    async saveVideoParams() {
+      const {
+        verticalFov,
+        horizontalFov,
+        pitch,
+        distance,
+        direction,
+        viewPosition,
+      } = window.projections[this.id];
+      const params = {
+        verticalFov,
+        horizontalFov,
+        pitch,
+        distance,
+        direction,
+        viewPosition,
+      };
+      const data = await saveVideoProjections(this.id, JSON.stringify(params));
+      this.serverParams = params;
+      this.$message({ message: "视频参数保存成功" });
+    },
+    //  还原服务端视频系数
+    doServerStyle() {
+      const video = document.getElementById(this.id).children[0];
+      const serverParams = this.serverParams;
+      const projectionImage = window.projections[this.id];
+      projectionImage.verticalFov = serverParams.verticalFov;
+      projectionImage.horizontalFov = serverParams.horizontalFov;
+      projectionImage.pitch = serverParams.pitch;
+      projectionImage.distance = serverParams.distance;
+      projectionImage.direction = serverParams.direction;
+      projectionImage.viewPosition = serverParams.viewPosition;
+      projectionImage.setImage({ video });
+      projectionImage.removeAllClipRegion();
+      projectionImage.build();
+    },
+    //  重置至最新的服务端视频数据
+    resetVideoParams() {},
   },
 };
 </script>
@@ -208,7 +269,8 @@ export default {
   background: rgba(0, 0, 0, 0.6);
   border-radius: 10px;
   &.video_visi {
-    visibility: hidden;
+    display: none;
+    z-index: -1;
   }
   > p {
     color: white;
@@ -235,7 +297,8 @@ export default {
       }
     }
   }
-  .operate-video {
+  .operate-video,
+  .update-video {
     margin-top: 10px;
     height: 30px;
     line-height: 30px;

@@ -8,96 +8,17 @@
 -->
 <template>
   <div class="rtmpVideo">
-    <!-- <div class="rtmpListFrame" v-if="doRtmpListFrame">
-      <header>
-        <span>现场视频</span> /
-        <span>{{ RtmpForcePoint.shortname }}</span>
-        <i class="close" @click="closeRtmpVideoFrame"></i>
-      </header>
-      <div class="rtmpVideoContent">
-        <div class="rtmpVideoList">
-          <header>
-            周边
-            <el-select
-              v-if="!isCircleVideo"
-              class="rtmp-video-range"
-              v-model="radiusRange"
-              @change="refreshRtmpVideoList"
-              placeholder="范围"
-            >
-              <el-option
-                v-for="item in radiusOption"
-                :key="item"
-                :label="item"
-                :value="item"
-              >
-              </el-option>
-            </el-select>
-            <i v-if="isCircleVideo">{{ radiusRange }}</i>
-            米
-            <i>({{ fixRtmpList.length }})</i>
-            <el-switch v-model="isHightVideo" name="高位" active-text="高位" />
-            <span
-              @click="videoOfPrivate = !videoOfPrivate"
-              :class="{ active: videoOfPrivate }"
-              >私有监控</span
-            >
-            <span
-              @click="videoOfPublic = !videoOfPublic"
-              :class="{ active: videoOfPublic }"
-              >公有监控</span
-            >
-          </header>
-          <div>
-            <ul>
-              <li
-                v-for="(item, index) in fixRtmpList"
-                :class="[forceRtmpVideo == item.mp_name ? 'rtmp_active' : '']"
-                :key="index"
-                @click="openRtmpVideoFrame(item)"
-              >
-                <span>
-                  <input
-                    id="custom-checkbox"
-                    type="checkbox"
-                    :checked="forceRtmpVideo === item.mp_name"
-                    @click="checkUniqueVideo(item)"
-                  />
-                </span>
-                <span :title="item.mp_name"
-                  >{{ index + 1 }}.{{ item.mp_name }}</span
-                >
-                <span>{{ item.dist }} 米</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="rtmpVideoFrame">
-          <header>
-            <p>{{ forceRtmpVideo }}</p>
-            <span
-              @click="videoSourceTop = false"
-              :class="{ active: !videoSourceTop }"
-              >Flash模式</span
-            >
-            <span
-              @click="videoSourceTop = true"
-              :class="{ active: videoSourceTop }"
-              >H5模式</span
-            >
-          </header>
-          <div>
-            <flv
-              v-if="RtmpVideoURL"
-              :url="RtmpVideoURL"
-              :mode="RtmpVideoMode"
-              :type="videoSourceTop"
-            />
-            <p v-if="!RtmpVideoURL">正在获取视频内容...</p>
-          </div>
-        </div>
-      </div>
-    </div> -->
+    <header>已开启视频列表</header>
+    <ul class="rtmpVideoForceList">
+      <li
+        v-for="(value, key, index) in onMapVideo"
+        :key="index"
+        :class="{ active: onMapVideoForceId == `Rtsp${value.mp_id}` }"
+        @click="SetOnMapVideoForceId(`Rtsp${value.mp_id}`)"
+      >
+        {{ value.mp_name }}
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -117,13 +38,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("map", ["rtmpList", "rtmpListOther"]),
+    ...mapGetters("map", ["rtmpList", "onMapVideo", "onMapVideoForceId"]),
   },
   async mounted() {
     this.eventRegsiter();
   },
   methods: {
-    ...mapActions("map", ["SetRtmpList", "SetOnMapVideo"]),
+    ...mapActions("map", ["SetRtmpList", "SetOnMapVideo", "SetOnMapVideoForceId"]),
     //  事件绑定
     eventRegsiter() {
       const that = this;
@@ -224,6 +145,34 @@ export default {
 
 <style lang="less" scoped>
 .rtmpVideo {
-  display: block;
+  position: fixed;
+  height: auto;
+  width: 300px;
+  left: 10px;
+  bottom: 10px;
+  z-index: 30;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 10px;
+  > header {
+    font-weight: bold;
+    line-height: 30px;
+  }
+  > ul {
+    > li {
+      height: 30px;
+      line-height: 30px;
+      cursor: pointer;
+      box-sizing: border-box;
+      padding: 0 4px;
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+      &.active {
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
 }
 </style>

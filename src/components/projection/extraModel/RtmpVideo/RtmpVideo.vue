@@ -7,7 +7,20 @@
  * @FilePath: \wz-city-culture-tour\src\components\projection\extraModel\RtmpVideo\RtmpVideo.vue
 -->
 <template>
-  <div class="rtmpVideo" />
+  <div class="rtmpVideo">
+    <header>已开启视频列表</header>
+    <ul class="rtmpVideoForceList">
+      <li
+        v-for="(value, key, index) in onMapVideo"
+        :key="index"
+        :class="{ active: onMapVideoForceId == `Rtsp${value.mp_id}` }"
+        v-show="value.isOn"
+        @click="SetOnMapVideoForceId(`Rtsp${value.mp_id}`)"
+      >
+        {{ value.mp_name }}
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
@@ -26,13 +39,18 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("map", ["rtmpList"]),
+    ...mapGetters("map", ["rtmpList", "onMapVideo", "onMapVideoForceId"]),
+  },
+  watch: {
+    onMapVideoForceId(n, o) {
+      console.log("new", n);
+    },
   },
   async mounted() {
     this.eventRegsiter();
   },
   methods: {
-    ...mapActions("map", ["SetRtmpList", "SetOnMapVideo"]),
+    ...mapActions("map", ["SetRtmpList", "SetOnMapVideo", "SetOnMapVideoForceId"]),
     //  事件绑定
     eventRegsiter() {
       const that = this;
@@ -72,7 +90,7 @@ export default {
         });
       } else {
         const { data } = await getRtmpVideoURL(mp_id);
-        this.SetOnMapVideo({ mp_id, mp_name, position, ...data });
+        this.SetOnMapVideo({ mp_id, mp_name, position, ...data, isOn: true });
       }
     },
     /**
@@ -131,8 +149,36 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .rtmpVideo {
-  display: block;
+  position: fixed;
+  height: auto;
+  width: 300px;
+  left: 10px;
+  bottom: 10px;
+  z-index: 30;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 10px;
+  > header {
+    font-weight: bold;
+    line-height: 30px;
+  }
+  > ul {
+    > li {
+      height: 30px;
+      line-height: 30px;
+      cursor: pointer;
+      box-sizing: border-box;
+      padding: 0 4px;
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+      &.active {
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
 }
 </style>
